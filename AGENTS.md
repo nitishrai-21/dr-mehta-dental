@@ -254,29 +254,32 @@ The schema contains a prescription domain with items, and the project now includ
 - [x] Luxury prescription PDF includes a branded clinical layout, patient metadata, medication table, and footer details
 - [x] Production build passes successfully after route, auth, audit, prescription-share, and premium export polish
 
-### Still evolving / not yet production-safe
+### Current auth and role model
 
-- [x] Admin credential hashing and DB-backed password validation are in place
-- [x] Prisma migration for the admin password hash field has been added and applied
-- [x] Role-aware server-side admin access checks are enforced during session validation
-- [x] Protected admin routes remain redirect-safe without Node-only crypto in middleware
-- [x] Audit log model is added for key admin and workflow actions
-- [x] Prescription export polish is improved with cleaner print/download behavior
-- [ ] Formal staff/admin role management and stronger session lifecycle controls
-- [ ] Better notification flow for appointment updates
-- [ ] Business polish and production safety checks
-- [ ] Full deployment hardening and environment security review
+The project now uses a real database-backed auth model with two roles:
+
+- [x] `ADMIN`: full access to dashboard, appointments, patients, audit logs, and prescription creation
+- [x] `RECEPTION`: appointment and patient view permissions plus appointment status updates, but no prescription creation or admin-only audit access
+- [x] PBKDF2 password hashing is applied to seeded admin accounts in the `admins` table
+- [x] session cookies are signed and validated server-side using a secret-based HMAC pattern
+- [x] middleware guards all `/admin/*` routes and redirects unauthenticated users to `/admin/login`
+- [x] the admin layout and header now render the actual logged-in user name and initials instead of hardcoded values
+- [x] the route loop bug caused by redirecting from the `/admin` layout itself was fixed
+- [x] the app builds successfully without importing server-only `next/headers` code into client components
 
 ### Verified current state
 
 The app is now in a strong client-demo phase with the following verified outcomes:
 
 - admin dashboard and route protection are working
+- both `ADMIN` and `RECEPTION` roles can sign in with database-backed credentials
+- reception staff can update appointment status, while admin-only actions remain protected
 - patient prescription access works without login using a secure share link
 - audit activity is visible on patient, appointment, and prescription detail pages
 - the central audit overview page is available from the admin sidebar
-- production build currently completes successfully with the latest route set
-- the project is ready for client-facing walkthroughs and demo iterations, while still remaining intentionally non-production-grade in its auth and operational hardening
+- the dashboard and header show the current authenticated user name and initials
+- production build currently completes successfully with the latest auth and route set
+- the project is ready for client-facing walkthroughs and demo iterations, while still remaining intentionally non-production-grade in its operational hardening
 
 ---
 
@@ -309,19 +312,22 @@ This gives the project a practical patient access model without requiring an acc
 
 ### Current milestone status
 
-The app is now beyond a static admin shell and into a working demo auth and admin workflow experience, with an additional patient-safe prescription access layer. The current milestone includes:
+The app is now beyond a static admin shell and into a working role-based admin workflow experience, with an additional patient-safe prescription access layer. The current milestone includes:
 
-- admin login is working via a hashed, DB-backed credential flow
+- login works through a hashed, DB-backed credential flow using the `admins` table
 - protected admin routes are enforced by middleware plus server-side auth checks
-- dashboard shell does not render on the login screen
-- signed session cookies allow authenticated admins to access secure pages
-- admin sessions are denied when the stored role is not ADMIN
+- the dashboard shell does not render on the login screen
+- signed session cookies allow authenticated users to access protected pages
+- session validation rejects missing, expired, or role-mismatched users
+- admin and reception accounts are both supported in the demo seed set
 - core admin list pages are functioning and paginated
+- reception users can update appointment status while admin-only features remain gated
 - prescription records can be shared via a secure no-login URL from the admin detail view
 - prescription share links can be copied and opened directly from the admin page
 - key clinic actions are captured in an audit log for traceability
 - prescription details are print-friendly and more polished for export/download flows
-- the app builds cleanly with the current route set and Edge-safe middleware
+- the dashboard and header display the actual logged-in user's name and initials
+- the app builds cleanly with the current route set and middleware/server boundary fixes
 
 ---
 
@@ -366,8 +372,8 @@ The overall objective is a realistic dental clinic app that combines a strong pu
 
 Current local demo credentials are:
 
-- Email: admin@drmehta-demo.local
-- Password: DrMehta123!
+- Admin: admin@drmehta-demo.local / DrMehta123!
+- Reception: reception@drmehta-demo.local / Reception123!
 
 These are intentionally suitable for development work and should be replaced with secure env-backed values before production use.
 

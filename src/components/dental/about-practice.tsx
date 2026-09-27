@@ -29,9 +29,9 @@ const highlights = [
 
 export function AboutPractice() {
   return (
-    <section id="about" className="bg-background py-16 sm:py-20 lg:py-24">
+    <section id="about" className="bg-background py-5 sm:py-6 lg:py-8">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+        <div className="grid items-center gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
           {/* Doctor visual */}
           <div className="relative">
             <div className="relative aspect-[4/4.5] overflow-hidden rounded-[1.75rem] bg-primary-light">
@@ -84,16 +84,16 @@ export function AboutPractice() {
               About the practice
             </p>
 
-            <h2 className="mt-3 max-w-xl text-4xl font-semibold leading-tight sm:text-5xl">
+            <h2 className="mt-2 max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">
               Experienced care with a personal touch.
             </h2>
 
-            <p className="mt-5 max-w-2xl text-base leading-7 text-muted">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
               Dr. Arjun Mehta provides thoughtful, personalised dental care in a
               comfortable and welcoming environment.
             </p>
 
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
               With more than 15 years of experience across general and cosmetic
               dentistry, the practice combines modern techniques with a simple
               philosophy: listen carefully, explain clearly, and treat every
@@ -101,7 +101,7 @@ export function AboutPractice() {
             </p>
 
             {/* Highlights */}
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {highlights.map((highlight) => {
                 const Icon = highlight.icon;
 
@@ -111,11 +111,11 @@ export function AboutPractice() {
                       <Icon className="h-4 w-4" />
                     </div>
 
-                    <h3 className="mt-3 text-sm font-semibold text-foreground">
+                    <h3 className="mt-2.5 text-sm font-semibold text-foreground">
                       {highlight.title}
                     </h3>
 
-                    <p className="mt-1.5 text-xs leading-5 text-muted">
+                    <p className="mt-1 text-xs leading-5 text-muted">
                       {highlight.description}
                     </p>
                   </div>
@@ -124,7 +124,7 @@ export function AboutPractice() {
             </div>
 
             {/* Small trust row */}
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border pt-6">
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border pt-5">
               <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <Check className="h-4 w-4 text-primary" />
                 Patient-first philosophy

@@ -50,6 +50,11 @@ export function LoginForm() {
         />
       </div>
 
+      <div className="rounded-xl border border-border bg-surface-muted px-3 py-2 text-xs text-muted">
+        Demo accounts: admin@drmehta-demo.local / DrMehta123! or
+        reception@drmehta-demo.local / Reception123!
+      </div>
+
       {state?.message ? (
         <div
           className={`rounded-xl border px-3 py-2 text-sm ${

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, Clock3, UserPlus } from "lucide-react";
 import { prisma } from "@/lib/db/prisma";
 import { DashboardStats } from "@/components/admin/dashboard-stats";
+import { getCurrentAdmin } from "@/lib/auth";
 
 function startOfToday() {
   const date = new Date();
@@ -62,6 +63,15 @@ function formatStatus(status: string) {
 }
 
 export default async function AdminDashboardPage() {
+  const currentAdmin = await getCurrentAdmin();
+  const displayName = currentAdmin?.name || "Admin";
+  const firstInitials = displayName
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   const todayStart = startOfToday();
   const todayEnd = endOfToday();
 
@@ -138,7 +148,7 @@ export default async function AdminDashboardPage() {
         </p>
 
         <h2 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">
-          {getGreeting()}, Dr. Mehta
+          {getGreeting()}, {displayName}
         </h2>
 
         <p className="mt-2 text-sm text-muted">

@@ -4,8 +4,7 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import {
   clearAdminSession,
-  getAdminCredentials,
-  hashPassword,
+  ensureDefaultAdminUsers,
   setAdminSession,
   verifyPassword,
 } from "@/lib/auth";
@@ -39,32 +38,24 @@ export async function loginAdmin(
   }
 
   const { email, password } = parsed.data;
-  const credentials = getAdminCredentials();
+  const normalizedEmail = email.toLowerCase();
 
-  if (email.toLowerCase() !== credentials.email) {
+  await ensureDefaultAdminUsers();
+
+  const admin = await prisma.admin.findUnique({
+    where: {
+      email: normalizedEmail,
+    },
+  });
+
+  if (!admin) {
     return {
       success: false,
       message: "Invalid email or password.",
     };
   }
 
-  const admin = await prisma.admin.upsert({
-    where: {
-      email: credentials.email,
-    },
-    update: {
-      name: "Dr. Mehta",
-      role: "ADMIN",
-    },
-    create: {
-      name: "Dr. Mehta",
-      email: credentials.email,
-      role: "ADMIN",
-      passwordHash: hashPassword(credentials.password),
-    },
-  });
-
-  if (admin.role !== "ADMIN") {
+  if (admin.role !== "ADMIN" && admin.role !== "RECEPTION") {
     return {
       success: false,
       message: "Access denied.",
@@ -73,20 +64,13 @@ export async function loginAdmin(
 
   const isPasswordValid = admin.passwordHash
     ? verifyPassword(password, admin.passwordHash)
-    : password === credentials.password;
+    : false;
 
   if (!isPasswordValid) {
     return {
       success: false,
       message: "Invalid email or password.",
     };
-  }
-
-  if (!admin.passwordHash) {
-    await prisma.admin.update({
-      where: { id: admin.id },
-      data: { passwordHash: hashPassword(credentials.password) },
-    });
   }
 
   await setAdminSession(admin.email, admin.name, admin.role);

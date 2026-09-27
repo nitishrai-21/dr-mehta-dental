@@ -88,27 +88,27 @@ export function AppointmentSection() {
   return (
     <section
       id="contact"
-      className="border-t border-border bg-surface-muted py-16 sm:py-20 lg:py-24"
+      className="border-t border-border bg-surface-muted py-6 sm:py-8 lg:py-10"
     >
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
           {/* Appointment */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
               Book an appointment
             </p>
 
-            <h2 className="mt-3 max-w-lg text-4xl font-semibold leading-tight sm:text-5xl">
+            <h2 className="mt-2.5 max-w-lg text-3xl font-semibold leading-tight sm:text-4xl">
               Ready to take care of your smile?
             </h2>
 
-            <p className="mt-5 max-w-md text-sm leading-6 text-muted">
+            <p className="mt-4 max-w-md text-sm leading-6 text-muted">
               Tell us a little about what you need and our team will get back to
               you to confirm a convenient appointment time.
             </p>
 
             {/* Form */}
-            <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+            <form className="mt-7 space-y-4" onSubmit={handleSubmit}>
               {/* Name + Phone */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -320,20 +320,20 @@ export function AppointmentSection() {
           </div>
 
           {/* FAQ */}
-          <div id="faq" className="lg:pt-12">
+          <div id="faq" className="lg:pt-8">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
               Frequently asked questions
             </p>
 
-            <h2 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
+            <h2 className="mt-2.5 text-2xl font-semibold leading-tight sm:text-3xl">
               Have questions?
             </h2>
 
-            <p className="mt-4 max-w-lg text-sm leading-6 text-muted">
+            <p className="mt-3 max-w-lg text-sm leading-6 text-muted">
               A few things patients commonly ask before their appointment.
             </p>
 
-            <div className="mt-8 divide-y divide-border border-y border-border">
+            <div className="mt-7 divide-y divide-border border-y border-border">
               {faqs.map((faq, index) => {
                 const isOpen = openIndex === index;
 
@@ -343,7 +343,7 @@ export function AppointmentSection() {
                       type="button"
                       onClick={() => setOpenIndex(isOpen ? null : index)}
                       aria-expanded={isOpen}
-                      className="flex w-full items-center justify-between gap-5 py-5 text-left"
+                      className="flex w-full items-center justify-between gap-5 py-4.5 text-left"
                     >
                       <span className="text-sm font-semibold text-foreground sm:text-base">
                         {faq.question}
@@ -358,7 +358,7 @@ export function AppointmentSection() {
 
                     <div
                       className={`grid transition-all duration-200 ${
-                        isOpen ? "grid-rows-[1fr] pb-5" : "grid-rows-[0fr]"
+                        isOpen ? "grid-rows-[1fr] pb-4" : "grid-rows-[0fr]"
                       }`}
                     >
                       <div className="overflow-hidden">
@@ -373,7 +373,7 @@ export function AppointmentSection() {
             </div>
 
             {/* Clinic contact details */}
-            <div className="mt-7 border-t border-border pt-6">
+            <div className="mt-6 border-t border-border pt-5">
               <div className="grid gap-4 sm:grid-cols-3">
                 <a
                   href="tel:+918012345678"

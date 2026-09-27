@@ -56,7 +56,7 @@ export function Testimonials() {
   };
 
   return (
-    <section id="reviews" className="bg-background py-16 sm:py-20 lg:py-24">
+    <section id="reviews" className="bg-background py-8 sm:py-10 lg:py-12">
       <div className="mx-auto max-w-5xl px-5 lg:px-8">
         {/* Heading */}
         <div className="text-center">
@@ -64,11 +64,11 @@ export function Testimonials() {
             Patient experiences
           </p>
 
-          <h2 className="mx-auto mt-3 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">
+          <h2 className="mx-auto mt-2 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">
             What our patients have to say.
           </h2>
 
-          <div className="mt-5 flex items-center justify-center gap-3">
+          <div className="mt-4 flex items-center justify-center gap-3">
             <Stars />
 
             <span className="text-sm text-muted">4.9 average rating</span>
@@ -76,12 +76,12 @@ export function Testimonials() {
         </div>
 
         {/* Carousel */}
-        <div className="mt-10">
-          <div className="relative overflow-hidden rounded-[2rem] bg-primary px-6 py-10 text-white sm:px-10 sm:py-12 lg:px-16 lg:py-14">
+        <div className="mt-8">
+          <div className="relative overflow-hidden rounded-[2rem] bg-primary px-6 py-9 text-white sm:px-10 sm:py-11 lg:px-16 lg:py-12">
             {/* Quote mark */}
             <div
               aria-hidden="true"
-              className="absolute left-6 top-3 font-serif text-[100px] leading-none text-white/10 sm:left-10"
+              className="absolute left-6 top-3 font-serif text-[90px] leading-none text-white/10 sm:left-10"
             >
               “
             </div>
@@ -91,12 +91,12 @@ export function Testimonials() {
 
               <blockquote
                 key={activeIndex}
-                className="mt-7 font-serif text-2xl leading-9 sm:text-3xl sm:leading-10"
+                className="mt-6 font-serif text-xl leading-8 sm:text-2xl sm:leading-9"
               >
                 “{testimonial.quote}”
               </blockquote>
 
-              <div className="mt-8">
+              <div className="mt-7">
                 <p className="text-sm font-semibold">{testimonial.name}</p>
 
                 <p className="mt-1 text-xs text-white/60">
@@ -106,7 +106,7 @@ export function Testimonials() {
             </div>
 
             {/* Navigation */}
-            <div className="relative mt-10 flex items-center justify-between">
+            <div className="relative mt-8 flex items-center justify-between">
               <button
                 type="button"
                 onClick={previous}
@@ -133,7 +133,7 @@ export function Testimonials() {
           </div>
 
           {/* Progress */}
-          <div className="mt-5 flex justify-center gap-2">
+          <div className="mt-4 flex justify-center gap-2">
             {testimonials.map((testimonialItem, index) => (
               <button
                 key={testimonialItem.name}
@@ -152,7 +152,7 @@ export function Testimonials() {
         </div>
 
         {/* Demo notice */}
-        <p className="mt-6 text-center text-[11px] text-muted">
+        <p className="mt-5 text-center text-[11px] text-muted">
           Demo testimonials and rating for this portfolio project. Replace with
           verified patient reviews before using for a real clinic.
         </p>

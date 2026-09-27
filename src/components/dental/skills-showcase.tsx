@@ -48,25 +48,25 @@ const skills = [
 
 export function SkillsShowcase() {
   return (
-    <section className="bg-surface-muted py-16 sm:py-20 lg:py-24">
+    <section className="bg-surface-muted py-8 sm:py-10 lg:py-12">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Why clients choose this approach
           </p>
 
-          <h2 className="mt-3 text-4xl font-semibold leading-tight sm:text-5xl">
+          <h2 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">
             Built to look premium and perform like a real business system.
           </h2>
 
-          <p className="mt-5 text-base leading-7 text-muted">
+          <p className="mt-4 text-sm leading-6 text-muted sm:text-base sm:leading-7">
             This project blends strong product design with practical
             engineering, giving clients a polished experience and a reliable
             foundation for future growth.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {skills.map(({ title, description, icon: Icon }) => (
             <div
               key={title}

@@ -1,7 +1,18 @@
 import { Bell, LogOut, Search } from "lucide-react";
 import { logoutAdmin } from "@/app/actions/auth";
 
-export function AdminHeader() {
+export function AdminHeader({
+  displayName = "Admin",
+}: {
+  displayName?: string;
+}) {
+  const initials = displayName
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-5 backdrop-blur sm:px-6 lg:px-8">
       <div className="pl-12 lg:pl-0">
@@ -45,7 +56,7 @@ export function AdminHeader() {
         </form>
 
         <div className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-          DM
+          {initials}
         </div>
       </div>
     </header>

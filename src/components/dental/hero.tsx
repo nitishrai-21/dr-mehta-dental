@@ -75,9 +75,9 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-background">
-      <div className="mx-auto max-w-7xl px-5 pb-12 pt-10 sm:pb-14 sm:pt-14 lg:px-8 lg:pb-16 lg:pt-16">
+      <div className="mx-auto max-w-7xl px-5 pb-8 pt-8 sm:pb-10 sm:pt-10 lg:px-8 lg:pb-12 lg:pt-12">
         {/* Hero */}
-        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+        <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
           {/* Content */}
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary-light px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
@@ -88,18 +88,18 @@ export function Hero() {
               Modern dental care
             </div>
 
-            <h1 className="mt-6 max-w-2xl text-5xl font-semibold leading-[1.04] tracking-tight text-foreground sm:text-6xl lg:text-[4.5rem]">
+            <h1 className="mt-5 max-w-2xl text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.75rem]">
               Confident smiles start with{" "}
               <span className="text-primary">exceptional care.</span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-base leading-7 text-muted sm:text-lg">
+            <p className="mt-4 max-w-xl text-sm leading-6 text-muted sm:text-base">
               Personalised dental care in a calm, modern environment. From
               everyday dental health to advanced treatments, your comfort comes
               first.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <a
                 href="#contact"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md"
@@ -117,7 +117,7 @@ export function Hero() {
             </div>
 
             {/* Trust points */}
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-border pt-6 text-sm text-muted">
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 border-t border-border pt-5 text-sm text-muted">
               <span className="flex items-center gap-2">
                 <span className="text-accent" aria-hidden="true">
                   ✓
@@ -155,7 +155,7 @@ export function Hero() {
                   <CarouselItem key={slide.image}>
                     <div className="relative overflow-hidden rounded-[2rem] bg-surface">
                       {/* Image */}
-                      <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
+                      <div className="relative aspect-[5/4] overflow-hidden rounded-[2rem]">
                         <Image
                           src={slide.image}
                           alt={slide.title}
@@ -181,7 +181,7 @@ export function Hero() {
 
                         {/* Caption */}
                         <div className="absolute bottom-5 left-5 right-5 sm:bottom-6 sm:left-6 sm:right-6">
-                          <p className="max-w-sm font-serif text-2xl leading-tight text-white sm:text-3xl">
+                          <p className="max-w-sm font-serif text-xl leading-tight text-white sm:text-2xl">
                             {slide.title}
                           </p>
                         </div>
@@ -198,7 +198,7 @@ export function Hero() {
             </Carousel>
 
             {/* Floating information card */}
-            <div className="absolute -bottom-4 left-4 z-10 rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xl sm:left-auto sm:right-2">
+            {/* <div className="absolute -bottom-4 left-4 z-10 rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xl sm:left-auto sm:right-2">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-light text-accent">
                   ✦
@@ -212,14 +212,14 @@ export function Hero() {
                   <p className="text-xs text-muted">Comfort at every visit</p>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
         {/* Services */}
         <div
           id="services"
-          className="scroll-mt-24 mt-16 border-y border-border py-6 lg:mt-20"
+          className="scroll-mt-24 mt-10 border-y border-border py-5 lg:mt-12"
         >
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center">
             {/* Label */}
@@ -248,7 +248,7 @@ export function Hero() {
                   >
                     <Icon className="h-4 w-4 shrink-0 text-primary" />
 
-                    <span className="text-xs font-semibold leading-5 text-foreground transition-colors group-hover:text-primary sm:text-sm">
+                    <span className="text-xs font-semibold leading-5 text-foreground transition-colors group-hover:text-primary sm:text-[13px]">
                       {service.title}
                     </span>
                   </a>

@@ -8,10 +8,12 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 
+export type AdminRole = "ADMIN" | "RECEPTION";
+
 type AuthSession = {
   email: string;
   name: string;
-  role: string;
+  role: AdminRole;
   iat: number;
   exp: number;
 };
@@ -21,14 +23,64 @@ const SESSION_TTL_MS = 1000 * 60 * 60 * 8;
 const PBKDF2_ITERATIONS = 100000;
 const PBKDF2_KEY_LENGTH = 32;
 
-export function getAdminCredentials() {
-  const email = (process.env.ADMIN_EMAIL ?? "admin@drmehta-demo.local").trim();
-  const password = (process.env.ADMIN_PASSWORD ?? "DrMehta123!").trim();
+const DEFAULT_ADMIN_ACCOUNTS = [
+  {
+    email: "admin@drmehta-demo.local",
+    name: "Dr. Mehta",
+    role: "ADMIN",
+    password: "DrMehta123!",
+  },
+  {
+    email: "reception@drmehta-demo.local",
+    name: "Reception Desk",
+    role: "RECEPTION",
+    password: "Reception123!",
+  },
+] as const;
 
-  return {
-    email: email.toLowerCase(),
-    password,
-  };
+export function getAdminCredentials() {
+  return DEFAULT_ADMIN_ACCOUNTS.map((account) => ({
+    email: account.email,
+    name: account.name,
+    role: account.role,
+    password: account.password,
+  }));
+}
+
+export function hasRequiredRole(
+  currentRole: string | null,
+  minimumRole: AdminRole,
+) {
+  if (!currentRole) {
+    return false;
+  }
+
+  if (currentRole === "ADMIN") {
+    return true;
+  }
+
+  return currentRole === "RECEPTION" && minimumRole === "RECEPTION";
+}
+
+export async function ensureDefaultAdminUsers() {
+  for (const account of DEFAULT_ADMIN_ACCOUNTS) {
+    await prisma.admin.upsert({
+      where: {
+        email: account.email,
+      },
+      update: {
+        name: account.name,
+        role: account.role,
+        passwordHash: hashPassword(account.password),
+      },
+      create: {
+        name: account.name,
+        email: account.email,
+        role: account.role,
+        passwordHash: hashPassword(account.password),
+      },
+    });
+  }
 }
 
 export function hashPassword(password: string) {
@@ -142,56 +194,45 @@ export async function getCurrentAdmin() {
 
   const session = decodeSession(payloadPart);
 
-  if (!session || Date.now() > session.exp || session.role !== "ADMIN") {
+  if (
+    !session ||
+    Date.now() > session.exp ||
+    (session.role !== "ADMIN" && session.role !== "RECEPTION")
+  ) {
     return null;
   }
 
   const admin = await prisma.admin.findUnique({
     where: {
-      email: session.email,
+      email: session.email.toLowerCase(),
     },
   });
 
-  if (admin && admin.role !== "ADMIN") {
+  if (!admin || admin.role !== session.role) {
     return null;
   }
 
-  if (admin) {
-    return admin;
-  }
-
-  const seededAdmin = await prisma.admin.upsert({
-    where: {
-      email: session.email,
-    },
-    update: {
-      name: session.name,
-      role: "ADMIN",
-    },
-    create: {
-      name: session.name,
-      email: session.email,
-      role: "ADMIN",
-    },
-  });
-
-  return seededAdmin;
+  return admin;
 }
 
-export async function requireAdmin() {
+export async function requireRole(requiredRole: AdminRole) {
   const admin = await getCurrentAdmin();
 
-  if (!admin || admin.role !== "ADMIN") {
+  if (!admin || !hasRequiredRole(admin.role, requiredRole)) {
     redirect("/admin/login");
   }
 
   return admin;
 }
 
+export async function requireAdmin() {
+  return requireRole("ADMIN");
+}
+
 export async function setAdminSession(
   email: string,
   name: string,
-  role = "ADMIN",
+  role: AdminRole = "ADMIN",
 ) {
   const cookieStore = await cookies();
   const session: AuthSession = {

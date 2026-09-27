@@ -35,11 +35,14 @@ This makes the public-facing site feel more like a genuine business website and 
 The app now includes:
 
 - a login page at /admin/login
+- database-backed admin identity records stored in the `admins` table
 - middleware-based route protection for admin pages
-- a cookie-based session for authenticated admins
+- a signed cookie-based session for authenticated users
 - logout from the admin UI
-- dashboard shell hidden when visiting the login screen
+- dashboard shell hidden on the login screen
 - working protected admin pages for appointments, patients, and prescription records
+- a two-role model: `ADMIN` and `RECEPTION`
+- seeded demo accounts for both roles
 
 This is a working demo-grade implementation and is significantly closer to a real clinic workflow than the initial static admin shell.
 
@@ -95,22 +98,24 @@ This is now considered a stable client-demo baseline for the audit and prescript
 
 ### Remaining auth work
 
-- replace env-based fallback credentials with a more explicit admin bootstrap / user management process
-- add role checks for admin-only pages
-- add logout/session expiry cleanup and stronger session validation
-- improve production-ready security and environment config
-- enforce a clear separation between seeded demo admin data and real production identities
+- replace demo-only bootstrap data with a formal user management workflow for real staff accounts
+- add stronger session lifecycle controls and account status management
+- improve production secret configuration and environment isolation
+- add role-restricted user management screens for admin-only staff setup
+- enforce a clear separation between seeded demo identities and real production identities
 
 ### Auth hardening update
 
 The project has now advanced to a more secure interim state:
 
 - `Admin.passwordHash` is part of the schema
-- admin login validates against a PBKDF2-hashed password value in the database
-- the migration for the password-hash field has been created and applied
-- protected admin routes now behave as a signed-in-only guard, while server-side session validation enforces `ADMIN` role access
-- the middleware remains Edge-compatible and avoids Node-only crypto to keep the project build-safe in Next.js app routing
-- the app still keeps a safe demo fallback for the default admin account while moving toward true database-backed identities
+- login validates against a PBKDF2-hashed password value stored in the database
+- seeded demo accounts are created in the `admins` table for both `ADMIN` and `RECEPTION`
+- protected admin routes behave as signed-in-only guards, and server-side session validation enforces role access
+- the app enforces `ADMIN`-only permissions for sensitive actions such as prescription creation and audit access
+- `RECEPTION` users can update appointment status and review clinic records without being granted admin-only operational access
+- the middleware remains Edge-compatible and avoids Node-only crypto in the route guard
+- the app also fixed the redirect loop caused by redirecting from the `/admin` layout itself and removed client/server boundary issues that originally surfaced during build validation
 
 This is a meaningful production-readiness improvement, and the app now has both route protection and server-side role checks in place. The remaining work is formal staff/admin role management, stronger session lifecycle controls, and production auth hardening.
 
@@ -118,12 +123,13 @@ This is a meaningful production-readiness improvement, and the app now has both 
 
 The project has reached the following milestone:
 
-- admin login works with a hashed, DB-backed credential path
+- admin and reception login works with a hashed, DB-backed credential path
 - protected admin routes are enforced by middleware and server-side session validation
 - dashboard shell does not render on the login screen
-- session cookies allow signed-in admin access to secure pages
-- non-admin or invalid session values are rejected at the auth layer
+- session cookies allow signed-in users to access secure pages
+- invalid, expired, or role-mismatched sessions are rejected at the auth layer
 - core admin list pages are functioning and paginated
+- reception users can update appointment status while admin-only features remain protected
 - secure public prescription access works without login
 - the admin prescription detail page includes copy/open share-link controls for patient access
 - key clinician and workflow actions are recorded in the audit log
@@ -131,7 +137,8 @@ The project has reached the following milestone:
 - an admin-wide audit log page provides grouped filtering and recent activity review
 - the prescription view is print-friendly and cleaner for export/download use
 - the patient-facing PDF export is now polished as a luxury clinic letterhead document with premium styling
-- the app builds cleanly with the current route set and Edge-safe middleware
+- the dashboard and header display actual logged-in user names and initials rather than hardcoded values
+- the app builds cleanly with the current route set and fixed server/client auth boundaries
 - the admin password-hash migration has been applied successfully
 - the audit-log runtime crash was fixed and verified via a fresh production build
 
@@ -198,13 +205,13 @@ This is the easiest and most maintainable path for a Next.js app.
 
 Recommended setup:
 
-- Credentials provider for doctor login
+- Credentials provider for staff login
 - JWT or database sessions
 - middleware for route protection
 - secure cookie configuration
 - role checking for admin routes
 
-This remains the right next step for production hardening, but the current implementation already has a working demo flow and protected admin layout as a strong base.
+This remains the right next step for production hardening, but the current implementation already has a working real-demo flow with a two-role permission model and protected admin layout as a strong base.
 
 ### Alternative option: custom session system
 
@@ -214,7 +221,7 @@ A custom system may be acceptable for a demo, but it is generally less maintaina
 
 ### Current state of auth implementation
 
-The project currently uses a custom cookie-based demo auth flow rather than a hardened production auth library. This is intentional for the current phase, but it should be replaced with a more durable approach before real clinic use.
+The project currently uses a custom signed-cookie session flow with database-backed user checks instead of a hardened production auth library. This is intentional for the current phase, but it should be replaced with a more durable auth package before real clinic use.
 
 ---
 
@@ -224,28 +231,31 @@ The project currently uses a custom cookie-based demo auth flow rather than a ha
 
 Use the existing Prisma `Admin` model as the base for login identities.
 
-Suggested fields:
+Current fields in the app:
 
 - id
 - name
 - email
 - passwordHash
+- role
 - createdAt
 - updatedAt
 
-If this is a real production feature, add:
+This model is already used to represent both admin and reception identities in the current demo flow.
 
-- role
+If this grows into a real production feature, add:
+
 - isActive
 - lastLoginAt
+- audit-friendly staff metadata
 
 ### Credentials flow
 
-1. Doctor enters email and password
-2. Auth system validates credentials against the `Admin` table
-3. Server creates a secure session
-4. Protected routes verify an authenticated admin session
-5. Session is checked before rendering admin pages or running actions
+1. Staff enters email and password
+2. Auth system validates credentials against the `admins` table
+3. Server creates a signed session with the user role
+4. Protected routes verify the authenticated session and role
+5. Server actions enforce permissions based on `ADMIN` vs `RECEPTION`
 
 ### Middleware requirements
 

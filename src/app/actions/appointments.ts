@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentAdmin } from "@/lib/auth";
+import { getCurrentAdmin, hasRequiredRole } from "@/lib/auth";
 import { recordAuditLog } from "@/lib/audit";
 import { prisma } from "@/lib/db/prisma";
 import {
@@ -138,6 +138,15 @@ export async function updateAppointmentStatus(
   }
 
   try {
+    const currentAdmin = await getCurrentAdmin();
+
+    if (!currentAdmin || !hasRequiredRole(currentAdmin.role, "RECEPTION")) {
+      return {
+        success: false,
+        message: "You do not have permission to update appointment status.",
+      };
+    }
+
     const appointment = await prisma.appointment.findUnique({
       where: {
         id: parsedId.data,
@@ -171,8 +180,6 @@ export async function updateAppointmentStatus(
         },
       },
     });
-
-    const currentAdmin = await getCurrentAdmin();
 
     await recordAuditLog({
       adminId: currentAdmin?.id ?? null,

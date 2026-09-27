@@ -3,7 +3,7 @@
 import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentAdmin } from "@/lib/auth";
+import { getCurrentAdmin, hasRequiredRole } from "@/lib/auth";
 import { recordAuditLog } from "@/lib/audit";
 import { prisma } from "@/lib/db/prisma";
 
@@ -20,24 +20,13 @@ const createPrescriptionSchema = z.object({
   items: z.array(prescriptionItemSchema).min(1, "Add at least one medication."),
 });
 
-async function getDemoAdmin() {
-  return prisma.admin.upsert({
-    where: {
-      email: "admin@drmehta-demo.local",
-    },
-    update: {
-      name: "Dr. Mehta",
-      role: "ADMIN",
-    },
-    create: {
-      name: "Dr. Mehta",
-      email: "admin@drmehta-demo.local",
-      role: "ADMIN",
-    },
-  });
-}
-
 export async function ensurePrescriptionShareToken(prescriptionId: string) {
+  const currentAdmin = await getCurrentAdmin();
+
+  if (!currentAdmin || !hasRequiredRole(currentAdmin.role, "ADMIN")) {
+    return null;
+  }
+
   const prescription = await prisma.prescription.findUnique({
     where: {
       id: prescriptionId,
@@ -79,8 +68,6 @@ export async function ensurePrescriptionShareToken(prescriptionId: string) {
       shareToken: true,
     },
   });
-
-  const currentAdmin = await getCurrentAdmin();
 
   await recordAuditLog({
     adminId: currentAdmin?.id ?? null,
@@ -158,6 +145,15 @@ export async function createPrescription(
   }
 
   try {
+    const currentAdmin = await getCurrentAdmin();
+
+    if (!currentAdmin || !hasRequiredRole(currentAdmin.role, "ADMIN")) {
+      return {
+        success: false,
+        message: "Only admins can create prescriptions.",
+      };
+    }
+
     const appointment = await prisma.appointment.findUnique({
       where: {
         id: parsed.data.appointmentId,
@@ -196,13 +192,11 @@ export async function createPrescription(
       };
     }
 
-    const admin = await getDemoAdmin();
-
     const prescription = await prisma.prescription.create({
       data: {
         patientId: appointment.patientId,
         appointmentId: appointment.id,
-        adminId: admin.id,
+        adminId: currentAdmin.id,
         items: {
           create: parsed.data.items.map((item) => ({
             medication: item.medication,
@@ -216,8 +210,8 @@ export async function createPrescription(
     });
 
     await recordAuditLog({
-      adminId: admin.id,
-      actorEmail: admin.email,
+      adminId: currentAdmin.id,
+      actorEmail: currentAdmin.email,
       action: "PRESCRIPTION_CREATED",
       entityType: "Prescription",
       entityId: prescription.id,

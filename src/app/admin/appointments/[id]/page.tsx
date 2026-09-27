@@ -12,6 +12,7 @@ import { AuditLogPanel } from "@/components/admin/audit-log-panel";
 import { listAuditLogs } from "@/lib/audit";
 import { prisma } from "@/lib/db/prisma";
 import { AppointmentStatusActions } from "@/components/admin/appointment-status-actions";
+import { getCurrentAdmin } from "@/lib/auth";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("en-IN", {
@@ -48,6 +49,9 @@ export default async function AdminAppointmentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  const currentAdmin = await getCurrentAdmin();
+  const isAdmin = currentAdmin?.role === "ADMIN";
 
   const appointment = await prisma.appointment.findUnique({
     where: {
@@ -310,7 +314,8 @@ export default async function AdminAppointmentDetailPage({
               </div>
             </section>
           ) : (
-            appointment.status !== "CANCELLED" && (
+            appointment.status !== "CANCELLED" &&
+            isAdmin && (
               <section className="rounded-2xl border border-dashed border-border bg-surface">
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-4">
@@ -318,6 +323,7 @@ export default async function AdminAppointmentDetailPage({
                       <p className="text-sm font-semibold">
                         No prescription issued yet
                       </p>
+
                       <p className="mt-1 text-xs text-muted">
                         Create a prescription for this appointment when
                         treatment is ready.

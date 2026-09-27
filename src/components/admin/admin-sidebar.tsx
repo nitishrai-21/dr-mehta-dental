@@ -22,32 +22,40 @@ const navigation = [
     name: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+    roles: ["ADMIN", "RECEPTION"],
   },
   {
     name: "Appointments",
     href: "/admin/appointments",
     icon: CalendarDays,
+    roles: ["ADMIN", "RECEPTION"],
   },
   {
     name: "Patients",
     href: "/admin/patients",
     icon: Users,
+    roles: ["ADMIN", "RECEPTION"],
   },
   {
     name: "Prescriptions",
     href: "/admin/prescriptions",
     icon: Pill,
+    roles: ["ADMIN", "RECEPTION"],
   },
   {
     name: "Audit Log",
     href: "/admin/audit",
     icon: Clock3,
+    roles: ["ADMIN"],
   },
-];
+] as const;
 
-export function AdminSidebar() {
+export function AdminSidebar({ role }: { role: "ADMIN" | "RECEPTION" }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const visibleNavigation = navigation.filter((item) =>
+    item.roles.some((allowedRole) => allowedRole === role),
+  );
 
   return (
     <>
@@ -109,7 +117,7 @@ export function AdminSidebar() {
             Clinic
           </p>
 
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const Icon = item.icon;
 
             const isActive =
