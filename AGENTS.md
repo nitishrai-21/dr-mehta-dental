@@ -198,7 +198,7 @@ These are for local review and should be replaced with real staff accounts befor
 ## Rules for future work
 
 - keep the public branding premium and believable
-- do not expose patient data publicly
+- do not expose patient data publicly. This is very important
 - keep the clinic assistant informational and non-clinical
 - respect the current route structure and server/client boundaries
 - preserve the working auth, prescription, and audit flow when adding features
