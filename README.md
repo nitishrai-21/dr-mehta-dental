@@ -1,982 +1,212 @@
-Dr. Mehta Dental
+# Dr. Mehta Dental
 
-A modern full-stack dental clinic website and appointment management demo built with Next.js, TypeScript, PostgreSQL, Prisma, and Tailwind CSS.
+A premium dental clinic website and admin workflow demo built with Next.js, TypeScript, Prisma, and PostgreSQL.
 
-The project is intentionally designed as a freelance portfolio / client-demo application rather than only a static marketing website.
+The project combines a polished public-facing clinic brand with a working internal workflow for appointment intake, patient tracking, prescription generation, and operational auditing.
 
-The public-facing website presents the dental clinic professionally, while the backend is being developed into a practical admin system for managing appointment requests, patients, and prescriptions.
+## What is currently implemented
 
-Project Goals
+- Premium dental landing page and conversion-focused sections
+- Appointment request form with server-side validation and database persistence
+- Protected `/admin/*` access for staff users
+- Role-based admin login with `ADMIN` and `RECEPTION`
+- Patient, appointment, and prescription management screens
+- Secure public prescription links without login
+- Printable patient prescription page with PDF export
+- Runtime audit logging for key actions
+- Public clinic assistant using the Google Gemini API
+- Centralized clinic facts and pricing data in `src/lib/clinic-data.ts`
 
-This project demonstrates the ability to build a complete small-business web application with:
+## Stack
 
-A polished responsive public website
+### Frontend
 
-Appointment request workflow
+- Next.js 16
+- React 19
+- TypeScript
+- App Router
+- Tailwind CSS v4
+- `lucide-react`
+- `embla-carousel-react`
+- `jspdf`
 
-Server-side form validation
+### Backend
 
-PostgreSQL persistence
+- Prisma 7
+- PostgreSQL
+- Server actions
+- Zod validation
+- custom signed-cookie auth
+- Google Gemini REST API
 
-Prisma ORM
+## Project structure
 
-Admin dashboard
-
-Appointment management
-
-Patient management
-
-Appointment history
-
-Prescription management
-
-Relational database design
-
-Production-oriented project structure
-
-Clear separation between public UI, server actions, validation, and database access
-
-The application is currently a demo project, so authentication, email notifications, payment processing, and other production concerns are intentionally kept for later phases.
-
-Tech Stack
-Frontend
-
-Next.js 16
-
-React 19
-
-TypeScript
-
-App Router
-
-Tailwind CSS v4
-
-shadcn/ui
-
-Base UI
-
-tw-animate-css
-
-lucide-react
-
-Embla Carousel
-
-next/image
-
-Backend
-
-Next.js Server Actions
-
-Prisma ORM 7
-
-PostgreSQL
-
-Neon PostgreSQL
-
-Zod
-
-Prisma PostgreSQL adapter
-
-Development
-
-ESLint
-
-TypeScript
-
-Prisma migrations
-
-Turbopack
-
-Package Versions
-
-Important project versions currently include:
-
-Next.js 16.3.6
-React 19.2.8
-Prisma 7.10.0
-TypeScript 5.9.3
-Node.js 22.x
-Tailwind CSS 4.x
-Zod 4.x
-PostgreSQL Neon
-
-The exact installed versions should always be confirmed from package.json and the lockfile rather than assumed from this document.
-
-Database Sync Notes
-
-This project includes an audit log table for admin activity tracking. If the database schema falls out of sync locally, the app can fail when loading audit history for patient, appointment, or prescription records.
-
-To guard against that, the dev startup flow now runs a small check before the Next.js server starts:
-
-npm run dev
-
-This invokes the audit log table ensure script automatically. You can also run it manually:
-
-npm run db:ensure-audit
-
-If Prisma migrations and the database drift apart, run:
-
-npx prisma migrate dev
-
-Current Architecture
-
-The project currently follows this general structure:
-
-dr-mehta-dental/
-│
-├── prisma/
-│ ├── schema.prisma
-│ └── migrations/
-│
-├── public/
-│ └── images/
-│ └── dental/
-│ ├── clinic.jpg
-│ ├── dentist.jpg
-│ ├── treatment.jpg
-│ ├── consultation.jpg
-│ └── interior.jpg
-│
-├── src/
-│ │
-│ ├── app/
-│ │ ├── globals.css
-│ │ ├── layout.tsx
-│ │ ├── page.tsx
-│ │ └── actions/appointments.ts
-│ │ └── admin/layout.tsx
-│ │ └── admin/page.tsx
-│ │
-│ ├── components/
-│ │ ├── dental/
-│ │ │ ├── navbar.tsx
-│ │ │ ├── hero.tsx
-│ │ │ ├── trust-strip.tsx
-│ │ │ ├── about.tsx
-│ │ │ ├── testimonials.tsx
-│ │ │ ├── appointment.tsx
-│ │ │ ├── faq.tsx
-│ │ │ └── footer.tsx
-│ │ │
-│ │ ├── admin/
-│ │ │ └── admin-header.tsx
-│ │ │ └── admin-sidebar.tsx
-│ │ │ └── dashbaord-stats.tsx
-│ │ │
-│ │ └── ui/
-│ │ ├── button.tsx
-│ │ ├── sheet.tsx
-│ │ ├── accordion.tsx
-│ │ └── carousel.tsx
-│ │
-│ ├── generated/
-│ │ └── prisma/
-│ │
-│ └── lib/
-│ ├── db/
-│ │ └── prisma.ts
-│ │
-│ ├── validations/
-│ │ └── appointment.ts
-│ │
-│ └── utils.ts
-│
-├── .env
-├── prisma7.config.ts
+```text
+.
+├── AGENTS.md
+├── BACKEND_ROADMAP.md
+├── CLAUDE.md
+├── env.sample
+├── middleware.ts
 ├── next.config.ts
 ├── package.json
-├── tsconfig.json
-└── README.md
+├── prisma/
+│   ├── schema.prisma
+│   └── migrations/
+├── public/
+│   └── images/
+├── scripts/
+│   └── ensure-audit-log-table.mjs
+├── src/
+│   ├── app/
+│   │   ├── actions/
+│   │   ├── admin/
+│   │   ├── api/assistant/route.ts
+│   │   ├── appointments/
+│   │   ├── prescriptions/
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── admin/
+│   │   ├── dental/
+│   │   └── ui/
+│   ├── generated/prisma/
+│   ├── lib/
+│   │   ├── audit.ts
+│   │   ├── auth.ts
+│   │   ├── clinic-data.ts
+│   │   ├── db/prisma.ts
+│   │   └── validations/appointment.ts
+│   └── ...
+├── README.md
+└── .env
+```
 
-Generated Prisma files under src/generated/prisma should not be manually edited.
+## Environment variables
 
-Public Website
+Use a local `.env` file with the required values:
 
-The public website is already polished and is currently the primary completed part of the application.
-
-The public page contains:
-
-Navigation
-
-Hero section
-
-Trust indicators
-
-About section
-
-Testimonials
-
-Appointment request section
-
-FAQ section
-
-Clinic contact information
-
-Footer
-
-The visual direction is intentionally:
-
-Professional
-
-Calm
-
-Premium
-
-Healthcare-oriented
-
-Minimal
-
-Responsive
-
-Suitable for a private dental clinic
-
-Design System
-
-The project uses CSS variables and Tailwind CSS.
-
-Current core colors include:
-
-Background: #f8f8f6
-Foreground: #17252b
-
-Surface: #ffffff
-Surface Muted: #f1f4f2
-
-Primary: #0f5c5e
-Primary Dark: #0b4648
-Primary Light: #e3f0ef
-
-Accent: #c79a5b
-Accent Light: #f4eadc
-
-Muted: #667477
-Border: #dfe6e3
-
-Typography uses:
-
-Inter for interface/body text
-
-Playfair for headings
-
-The design system should be preserved when building the admin interface so that the public site and dashboard feel like one product.
-
-Database
-
-The application uses PostgreSQL hosted on Neon.
-
-The project intentionally uses a hosted development database rather than requiring every developer to install PostgreSQL locally.
-
-Environment variable:
-
+```bash
 DATABASE_URL="..."
+GEMINI_API_KEY="..."
+AUTH_SECRET="..."  # or NEXTAUTH_SECRET
+NODE_ENV="development"
+PORT=3000
+```
 
-The actual database URL must never be committed to Git.
+Notes:
 
-Prisma
+- `DATABASE_URL` is required for Prisma and persistence.
+- `GEMINI_API_KEY` is required for the public clinic assistant.
+- `AUTH_SECRET` is used by the signed-cookie auth flow in `src/lib/auth.ts`.
+- Do not commit production secrets.
 
-Prisma is configured using Prisma 7.
+## Local setup
 
-The generated client is located at:
-
-src/generated/prisma
-
-The Prisma database client is exposed through:
-
-src/lib/db/prisma.ts
-
-Application code should import the shared client rather than creating new Prisma clients throughout the application.
-
-Database Models
-
-The current database contains:
-
-Admin
-Patient
-Appointment
-Prescription
-PrescriptionItem
-
-Admin
-
-Represents a clinic administrator/dental professional using the management system.
-
-Fields include:
-
-id
-
-name
-
-email
-
-createdAt
-
-updatedAt
-
-Relations:
-
-appointments
-
-prescriptions
-
-Patient
-
-Represents a patient.
-
-Fields include:
-
-id
-
-name
-
-phone
-
-email
-
-createdAt
-
-updatedAt
-
-Email is currently:
-
-Optional
-
-Not unique
-
-Phone is:
-
-Required
-
-Indexed
-
-Not unique
-
-This is intentional. A shared phone number or email address should not automatically be treated as a globally unique patient identity.
-
-Appointment
-
-Represents an appointment request or scheduled appointment.
-
-Important fields:
-
-patientId
-
-preferredDate
-
-preferredTime
-
-treatment
-
-patientStatus
-
-message
-
-status
-
-adminId
-
-createdAt
-
-updatedAt
-
-Appointment status:
-
-PENDING
-CONFIRMED
-CANCELLED
-COMPLETED
-
-The default status is:
-
-PENDING
-
-Public appointment requests therefore enter the admin system as pending requests.
-
-Prescription
-
-Represents a prescription associated with an appointment.
-
-It belongs to:
-
-Patient
-
-Appointment
-
-Admin
-
-A prescription can contain multiple prescription items.
-
-PrescriptionItem
-
-Represents an individual medication within a prescription.
-
-Current fields include:
-
-medication
-
-dosage
-
-frequency
-
-duration
-
-instructions
-
-This allows the demo to demonstrate a realistic one-to-many relationship.
-
-Appointment Workflow
-
-The current public appointment workflow is:
-
-Visitor
-│
-▼
-Appointment Form
-│
-▼
-Zod Validation
-│
-▼
-Server Action
-│
-▼
-Find patient by phone
-│
-├── Existing patient
-│ │
-│ ▼
-│ Update patient
-│
-└── New patient
-│
-▼
-Create patient
-│
-▼
-Create appointment
-│
-▼
-PENDING
-
-The appointment form currently collects:
-
-Full name
-
-Phone
-
-Email
-
-Preferred date
-
-Preferred time
-
-Treatment
-
-Patient status
-
-Message
-
-Validation
-
-Appointment input is validated server-side using Zod.
-
-Validation is located at:
-
-src/lib/validations/appointment.ts
-
-The validation layer should remain independent from the UI.
-
-The server action validates the incoming data again even if the frontend already performs validation.
-
-This is important because server actions must not trust client-provided data.
-
-Server Actions
-
-Appointment creation is currently implemented in:
-
-src/app/actions/appointments.ts
-
-The action:
-
-Receives appointment input
-
-Validates it with Zod
-
-Validates the appointment date
-
-Finds an existing patient by phone
-
-Updates the patient if found
-
-Creates a patient if necessary
-
-Creates the appointment
-
-Returns a structured success/error result
-
-The action does not expose Prisma directly to the browser.
-
-Prisma Migrations
-
-Database changes are managed through Prisma migrations.
-
-Example:
-
-npx prisma migrate dev --name add_patient_status
-
-After schema changes:
-
-npx prisma generate
-
-Useful commands:
-
-npx prisma migrate dev
-npx prisma generate
-npx prisma studio
-
-Never manually modify already-applied migration SQL unless there is a specific database recovery reason.
-
-Admin Dashboard Roadmap
-
-The admin system is the major next phase of the project.
-
-Phase 1 — Admin Shell
-
-Build:
-
-Admin layout
-
-Sidebar
-
-Header
-
-Dashboard navigation
-
-Responsive mobile navigation
-
-Dashboard overview
-
-Suggested navigation:
-
-Dashboard
-Appointments
-Patients
-Prescriptions
-
-Potential future sections:
-
-Settings
-Profile
-
-Phase 2 — Dashboard Overview
-
-Display useful clinic metrics:
-
-Today's appointments
-Pending requests
-Confirmed appointments
-Completed appointments
-New patients
-
-Add an appointment overview table containing:
-
-Patient
-
-Date
-
-Time
-
-Treatment
-
-Status
-
-Actions
-
-The dashboard should look like a real SaaS/business application rather than a collection of database tables.
-
-Phase 3 — Appointment Management
-
-Admin should be able to:
-
-View appointment
-
-Confirm appointment
-
-Cancel appointment
-
-Mark appointment completed
-
-View patient information
-
-View appointment history
-
-Open patient profile
-
-Useful filters:
-
-All
-Pending
-Confirmed
-Completed
-Cancelled
-
-Potential date filters:
-
-Today
-Tomorrow
-This week
-Custom range
-
-Phase 4 — Patient Management
-
-Create a searchable patient directory.
-
-Patient list should support:
-
-Name search
-
-Phone search
-
-Email search
-
-Pagination
-
-Patient detail page
-
-Patient detail should show:
-
-Patient information
-│
-├── Contact details
-│
-├── Appointment history
-│
-└── Prescriptions
-
-Phase 5 — Prescription Management
-
-Admin should be able to create a prescription from an appointment.
-
-Example flow:
-
-Appointment
-│
-▼
-Patient
-│
-▼
-Create prescription
-│
-├── Medication
-├── Dosage
-├── Frequency
-├── Duration
-└── Instructions
-
-Allow multiple medication rows.
-
-Example:
-
-Prescription
-├── Amoxicillin
-├── Ibuprofen
-└── Mouthwash
-
-Phase 6 — Demo Polish
-
-After the core functionality works:
-
-Loading states
-
-Empty states
-
-Error states
-
-Confirmation dialogs
-
-Toast notifications
-
-Skeleton loaders
-
-Responsive tables
-
-Mobile-friendly admin interface
-
-Search debounce
-
-Pagination
-
-URL-based filters
-
-Accessible keyboard navigation
-
-These details are important for demonstrating freelance-level implementation quality.
-
-Future Production Features
-
-These are intentionally not part of the current demo milestone.
-
-Potential production features include:
-
-Admin authentication
-
-Role-based access control
-
-Email notifications
-
-Appointment confirmation emails
-
-SMS/WhatsApp notifications
-
-Calendar integration
-
-Google Calendar integration
-
-File/document uploads
-
-Prescription PDF generation
-
-Audit logs
-
-Rate limiting
-
-CSRF/security hardening
-
-Automated backups
-
-Monitoring
-
-Error tracking
-
-Production database configuration
-
-Authentication
-
-Authentication should be added after the admin workflow has been built and tested.
-
-The demo currently prioritizes demonstrating the actual business workflow first.
-
-When authentication is introduced, it should protect:
-
-/admin/\*
-
-while keeping the public clinic website accessible.
-
-Current Progress
-Completed
-
-Next.js project setup
-
-App Router
-
-TypeScript
-
-Tailwind CSS v4
-
-shadcn/Base UI foundation
-
-Public dental website
-
-Responsive navigation
-
-Hero
-
-Trust section
-
-About section
-
-Testimonials
-
-Appointment section
-
-FAQ
-
-Clinic contact information
-
-Footer
-
-Prisma 7
-
-PostgreSQL
-
-Neon database
-
-Prisma schema
-
-Prisma migrations
-
-Generated Prisma client
-
-Shared Prisma database client
-
-Appointment Zod validation
-
-Appointment server action
-
-Patient creation/update workflow
-
-Appointment creation workflow
-
-Appointment status model
-
-Patient status model
-
-Prescription database model
-
-Prescription item database model
-
-Admin database model
-
-TypeScript compilation verified
-
-Production build verified
-
-Appointment submission tested successfully
-
-Current Database Status
-
-The database is synchronized with Prisma migrations.
-
-The current important relationships are:
-
-Admin
-│
-├── Appointment
-│
-└── Prescription
-│
-└── PrescriptionItem
-
-Patient
-│
-├── Appointment
-│
-└── Prescription
-
-Appointment:
-
-Patient ────< Appointment >──── Admin
-│
-│
-▼
-Prescription
-│
-▼
-PrescriptionItem
-
-Development Commands
-
-Install dependencies:
-
+```bash
 npm install
-
-Start development:
-
-npm run dev
-
-Run lint:
-
-npm run lint
-
-Run TypeScript checking:
-
-npx tsc --noEmit
-
-Create production build:
-
-npm run build
-
-Run production server:
-
-npm start
-
-Prisma:
-
 npx prisma generate
+npm run dev
+```
+
+If the audit log table is missing or drifted, run:
+
+```bash
+npm run db:ensure-audit
+```
+
+For schema changes or a fresh local migration cycle:
+
+```bash
 npx prisma migrate dev
-npx prisma studio
+```
 
-Important Development Rules
-Do not expose Prisma to client components
+## Scripts
 
-Database access belongs on the server.
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+npm run db:ensure-audit
+```
 
-Do not import Prisma into:
+## Demo credentials
 
-"use client"
+The seed data creates two demo staff accounts:
 
-components.
+- Admin: `admin@drmehta-demo.local` / `DrMehta123!`
+- Reception: `reception@drmehta-demo.local` / `Reception123!`
 
-Use server actions or server-side functions.
+These are intended for local review and demo use only, not production.
 
-Validate server-side
+## Public clinic assistant
 
-Client-side validation improves UX.
+The assistant is implemented in:
 
-Server-side validation provides the actual boundary.
+- `src/app/api/assistant/route.ts`
+- `src/components/dental/clinic-assistant.tsx`
+- `src/lib/clinic-data.ts`
 
-Every public form that modifies database state should validate its input on the server.
+### Current behavior
 
-Keep database identity separate from user data
+- clinic facts and pricing are centralized in `src/lib/clinic-data.ts`
+- the server prompt is built from the verified clinic record
+- the assistant supports inline instant FAQ responses for common questions
+- the endpoint validates payloads with Zod and limits message history
+- a basic in-memory per-IP rate limiter is present
+- the assistant is intentionally limited to non-clinical clinic logistics
 
-Do not assume:
+### Guardrails
 
-email = patient identity
-phone = patient identity
+- `GEMINI_API_KEY` must stay server-side
+- do not send personal or medical details to the assistant
+- do not diagnose or prescribe treatment
+- direct urgent concerns to the clinic or local emergency services
 
-The database ID is the patient identity.
+## Auth and admin workflow
 
-Email and phone are searchable attributes.
+The admin auth flow is implemented in `src/lib/auth.ts` and route protection is enforced by `middleware.ts`.
 
-Preserve the public design
+Current behavior:
 
-The public website is already polished.
+- `ADMIN` and `RECEPTION` roles exist in the schema
+- password hashes are stored in the `admins` table using PBKDF2
+- signed session cookies protect `/admin/*` routes
+- unauthenticated visitors are redirected to `/admin/login`
+- server-side checks restrict sensitive actions such as audit access and prescription creation
 
-New backend/admin work should not unnecessarily modify the public-facing design.
+## Data model highlights
 
-The admin interface should reuse the same design language while being optimized for operational workflows.
+The Prisma model includes:
 
-Portfolio Positioning
+- `Admin`
+- `Patient`
+- `Appointment`
+- `Prescription`
+- `PrescriptionItem`
+- `AuditLog`
 
-The project should eventually demonstrate more than:
+Appointment states include:
 
-"I can build a dental website."
+- `PENDING`
+- `CONFIRMED`
+- `CANCELLED`
+- `COMPLETED`
 
-The target demonstration is:
+Prescription sharing uses a secure token and a public patient-facing route without login.
 
-"I can build a complete small-business web application with a polished marketing site, appointment workflow, relational database, admin dashboard, patient management, and prescription management."
+## Future hardening notes
 
-That distinction is important for freelance opportunities.
+This is a working demo/prototype and still intentionally not a production clinic system.
 
-Next Immediate Milestone
+Planned improvements include:
 
-The next implementation milestone is:
+- replacing seeded demo staff accounts with a real staff-management flow
+- stronger session expiry and secret handling
+- shared rate limiting for the public assistant
+- more explicit environment separation and deployment checks
+- tighter privacy and audit review across admin actions
 
-ADMIN DASHBOARD FOUNDATION
-
-Recommended order:
-
-Admin route structure
-
-Admin layout
-
-Admin sidebar
-
-Dashboard page
-
-Dashboard statistics
-
-Appointment table
-
-Appointment status actions
-
-Patient directory
-
-Patient detail
-
-Prescription management
-
-Authentication
-
-Final production polish
-
-Do not start with authentication or advanced infrastructure before the core admin workflow is visually and functionally complete.
+The project is most useful as a realistic clinic workflow demo with a premium public brand and a working internal operations layer.

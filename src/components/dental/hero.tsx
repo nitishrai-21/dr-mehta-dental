@@ -154,7 +154,6 @@ export function Hero() {
                 {slides.map((slide) => (
                   <CarouselItem key={slide.image}>
                     <div className="relative overflow-hidden rounded-[2rem] bg-surface">
-                      {/* Image */}
                       <div className="relative aspect-[5/4] overflow-hidden rounded-[2rem]">
                         <Image
                           src={slide.image}
@@ -165,7 +164,6 @@ export function Hero() {
                           className="object-cover transition-transform duration-700"
                         />
 
-                        {/* Image overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
                         {/* Top label */}
@@ -196,23 +194,6 @@ export function Hero() {
 
               <CarouselNext className="right-4 border-white/20 bg-black/30 text-white backdrop-blur-md hover:bg-black/50 hover:text-white" />
             </Carousel>
-
-            {/* Floating information card */}
-            {/* <div className="absolute -bottom-4 left-4 z-10 rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xl sm:left-auto sm:right-2">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-light text-accent">
-                  ✦
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    Patient-first care
-                  </p>
-
-                  <p className="text-xs text-muted">Comfort at every visit</p>
-                </div>
-              </div>
-            </div> */}
           </div>
         </div>
 

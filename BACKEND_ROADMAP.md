@@ -2,664 +2,172 @@
 
 ## Overview
 
-This document defines the current project phase: secure doctor/admin login, protected clinic operations, appointment review, prescription creation, and patient-accessible prescription pages without requiring a login.
+This project is a working dental clinic website and admin workflow demo. It mixes a premium public brand with a real internal workflow for appointments, patient management, prescription generation, and audit review.
 
-The current project contains a solid foundation for:
-
-- a public website
-- Prisma models for patients, appointments, prescriptions, and admins
-- appointment creation from the public form
-- an admin dashboard shell and listing pages
-- a functional demo login flow with protected admin routes
-- patient-safe prescription sharing via unique token URLs
-
-The app is now beyond a static prototype and is functioning as a real product-style workflow demo with a clear next step toward production hardening.
+The current codebase is already beyond a static mockup. It is best treated as a realistic demo/portfolio product with a clear path toward production hardening.
 
 ---
 
-## Current Progress
+## Current status
 
-### Public website and product polish
+### Public website
 
-The app includes:
+The public site is implemented and includes:
 
-- premium clinic landing-page design
+- premium clinic landing page
+- hero section and CTA flow
 - trust indicators and service sections
-- testimonials and CTA flows
-- a developer-style skills showcase to present engineering value to clients
+- testimonials and FAQs
+- appointment request flow
+- clinic contact and location details
 
-This makes the public-facing site feel more like a genuine business website and less like a demo-only mockup.
+### Appointment workflow
 
-### Auth flow status
+The appointment system is live and persisted in Prisma:
 
-The app now includes:
+- patient lookup/upsert for new and existing people
+- appointment creation with status tracking
+- status values: `PENDING`, `CONFIRMED`, `CANCELLED`, `COMPLETED`
+- server-side validation before persistence
 
-- a login page at /admin/login
-- database-backed admin identity records stored in the `admins` table
-- middleware-based route protection for admin pages
-- a signed cookie-based session for authenticated users
-- logout from the admin UI
-- dashboard shell hidden on the login screen
-- working protected admin pages for appointments, patients, and prescription records
-- a two-role model: `ADMIN` and `RECEPTION`
-- seeded demo accounts for both roles
+Relevant files:
 
-This is a working demo-grade implementation and is significantly closer to a real clinic workflow than the initial static admin shell.
+- `src/app/actions/appointments.ts`
+- `src/lib/validations/appointment.ts`
+- `prisma/schema.prisma`
 
-### Route and UI status
+### Admin auth and role model
 
-The app also now includes:
+The app uses a custom DB-backed auth flow rather than a third-party auth library:
 
-- restored /admin/appointments and /admin/appointments/[id] routes
-- patient and prescription admin list pages
-- admin prescription detail view with secure share-link generation
-- copy/open patient share-link controls from the prescription detail page
-- pagination on large list views to limit load time and reduce heavy server queries
-- successful production build verification after route, auth, and prescription-share fixes
-- a public prescription view route for secure no-login access
+- `ADMIN` and `RECEPTION` roles exist in the schema
+- hashed passwords are stored in `admins`
+- signed session cookies protect `/admin/*`
+- middleware redirects unauthenticated users to `/admin/login`
+- server-side checks enforce role-aware access
 
-### Prescription sharing status
+Relevant files:
 
-A key milestone is now complete:
+- `src/lib/auth.ts`
+- `src/app/actions/auth.ts`
+- `middleware.ts`
 
-- prescriptions can generate a share token
-- the token is stored and reused when valid
-- a public URL can resolve the prescription record without login
-- the public page includes a premium PDF export action instead of a plain-text download
-- the patient-facing prescription view is print-friendly and better structured for export
-- the PDF is branded with a luxury dental clinic letterhead, patient details, medication table, and professional footer
-- token expiry is enforced before a prescription route is considered valid
+### Admin workflow pages
 
-This gives the project a practical patient-access model without redirecting patients into a login flow.
-
-### Audit trail status
-
-The project now includes a lightweight operational audit trail:
-
-- appointment creation events are recorded for patient intake actions
-- appointment status updates are logged with the actor and updated status
-- prescription creation and share-link generation are recorded in the database
-- logs are stored for traceability and operational review
-- patient, appointment, and prescription detail pages each render their own audit panels
-- the admin dashboard includes a centralized audit log page with entity filters and date-range filtering
-
-This adds a meaningful layer of credibility for a client-facing workflow demo and lays the foundation for a more serious clinic operations system.
-
-### Runtime safety and build verification
-
-A real runtime issue was identified and fixed during the audit-trail implementation:
-
-- root cause: direct Prisma model access (`prisma.auditLog.findMany`) could be undefined in the runtime client instance
-- fix: centralized safe access through a guarded audit helper and fallback behavior for missing model delegates
-- impact: the admin detail pages no longer crash when audit records are requested
-- verification: the project currently builds successfully with `npm run build` and the audit pages are included in the app route set
-
-This is now considered a stable client-demo baseline for the audit and prescription workflow.
-
-### Remaining auth work
-
-- replace demo-only bootstrap data with a formal user management workflow for real staff accounts
-- add stronger session lifecycle controls and account status management
-- improve production secret configuration and environment isolation
-- add role-restricted user management screens for admin-only staff setup
-- enforce a clear separation between seeded demo identities and real production identities
-
-### Auth hardening update
-
-The project has now advanced to a more secure interim state:
-
-- `Admin.passwordHash` is part of the schema
-- login validates against a PBKDF2-hashed password value stored in the database
-- seeded demo accounts are created in the `admins` table for both `ADMIN` and `RECEPTION`
-- protected admin routes behave as signed-in-only guards, and server-side session validation enforces role access
-- the app enforces `ADMIN`-only permissions for sensitive actions such as prescription creation and audit access
-- `RECEPTION` users can update appointment status and review clinic records without being granted admin-only operational access
-- the middleware remains Edge-compatible and avoids Node-only crypto in the route guard
-- the app also fixed the redirect loop caused by redirecting from the `/admin` layout itself and removed client/server boundary issues that originally surfaced during build validation
-
-This is a meaningful production-readiness improvement, and the app now has both route protection and server-side role checks in place. The remaining work is formal staff/admin role management, stronger session lifecycle controls, and production auth hardening.
-
-### Current milestone achieved
-
-The project has reached the following milestone:
-
-- admin and reception login works with a hashed, DB-backed credential path
-- protected admin routes are enforced by middleware and server-side session validation
-- dashboard shell does not render on the login screen
-- session cookies allow signed-in users to access secure pages
-- invalid, expired, or role-mismatched sessions are rejected at the auth layer
-- core admin list pages are functioning and paginated
-- reception users can update appointment status while admin-only features remain protected
-- secure public prescription access works without login
-- the admin prescription detail page includes copy/open share-link controls for patient access
-- key clinician and workflow actions are recorded in the audit log
-- the patient, appointment, and prescription detail pages display audit history
-- an admin-wide audit log page provides grouped filtering and recent activity review
-- the prescription view is print-friendly and cleaner for export/download use
-- the patient-facing PDF export is now polished as a luxury clinic letterhead document with premium styling
-- the dashboard and header display actual logged-in user names and initials rather than hardcoded values
-- the app builds cleanly with the current route set and fixed server/client auth boundaries
-- the admin password-hash migration has been applied successfully
-- the audit-log runtime crash was fixed and verified via a fresh production build
-
-This milestone should be treated as a strong foundation for the next security hardening pass.
-
----
-
-## Product Goal
-
-The application should support two main user groups:
-
-1. Doctor / clinic staff
-   - can securely log in to the admin dashboard
-   - can review appointment requests
-   - can update appointment status
-   - can create prescriptions
-   - can manage patient records and treatment history
-
-2. Patients
-   - can submit appointment requests
-   - can receive a secure link to view a prescription without needing to log in
-   - can access a clear, privacy-conscious prescription page
-   - can download the prescription details in a simple format
-
-The admin experience should feel practical and safe, while the patient-facing prescription access should remain minimal and secure.
-
----
-
-## Core Principles
-
-### 1. Security first
-
-- admin routes must be protected
-- no patient data should be publicly exposed
-- sensitive read/write actions must be server-only
-- access tokens must expire and be short-lived by design
-- admin credentials must be stored in environment variables or a secure secret store
-
-### 2. Real workflow over demo-only flow
-
-The app should support realistic clinic operations, not just static mock views.
-
-### 3. Minimal but functional MVP
-
-The current backend phase focuses on:
-
-- secure admin login
-- protected admin dashboard
-- appointment review flow
-- prescription creation
-- secure patient prescription access
-
-### 4. Maintain separation of concerns
-
-Keep the public site, admin site, server actions, validation, and database access distinct and testable.
-
----
-
-## Recommended Authentication Approach
-
-### Preferred option: NextAuth.js
-
-This is the easiest and most maintainable path for a Next.js app.
-
-Recommended setup:
-
-- Credentials provider for staff login
-- JWT or database sessions
-- middleware for route protection
-- secure cookie configuration
-- role checking for admin routes
-
-This remains the right next step for production hardening, but the current implementation already has a working real-demo flow with a two-role permission model and protected admin layout as a strong base.
-
-### Alternative option: custom session system
-
-Use this only if the project needs a simpler or more controlled setup.
-
-A custom system may be acceptable for a demo, but it is generally less maintainable than NextAuth for a production-like workflow.
-
-### Current state of auth implementation
-
-The project currently uses a custom signed-cookie session flow with database-backed user checks instead of a hardened production auth library. This is intentional for the current phase, but it should be replaced with a more durable auth package before real clinic use.
-
----
-
-## Auth Architecture
-
-### Admin user model
-
-Use the existing Prisma `Admin` model as the base for login identities.
-
-Current fields in the app:
-
-- id
-- name
-- email
-- passwordHash
-- role
-- createdAt
-- updatedAt
-
-This model is already used to represent both admin and reception identities in the current demo flow.
-
-If this grows into a real production feature, add:
-
-- isActive
-- lastLoginAt
-- audit-friendly staff metadata
-
-### Credentials flow
-
-1. Staff enters email and password
-2. Auth system validates credentials against the `admins` table
-3. Server creates a signed session with the user role
-4. Protected routes verify the authenticated session and role
-5. Server actions enforce permissions based on `ADMIN` vs `RECEPTION`
-
-### Middleware requirements
-
-Use Next.js middleware or route guards to protect:
-
-- /admin
-- /admin/appointments
-- /admin/patients
-- /admin/prescriptions
-- /admin/\*
-
-Unauthenticated users should be redirected to a login page.
-
----
-
-## Admin Dashboard Requirements
-
-The admin dashboard must behave like a clinic operations view.
-
-### Must-have pages
+The admin features currently in the repo include:
 
 - dashboard overview
-- appointments list
-- appointment detail view
-- patient list
-- patient detail view
-- prescription creation page
-- prescription detail page with share-link generation
+- appointment list/detail views
+- patient list/detail views
+- prescription creation flow
+- audit log pages and detail panels
+- role-aware action restrictions
 
-### Appointment features
+### Prescription sharing
 
-- view all appointment requests
-- filter by status
-- filter by date
-- search by patient name or phone
-- update status between:
-  - PENDING
-  - CONFIRMED
-  - CANCELLED
-  - COMPLETED
-- view patient details from the appointment
+The prescription flow is functional and patient-facing:
 
-### Dashboard metrics
+- prescriptions can generate share tokens
+- tokens are validated and expire when appropriate
+- a public route renders the prescription without login
+- the page supports PDF export and print-friendly layout
 
-- total appointments today
-- pending count
-- confirmed count
-- new patients today
-- recent requests list
+Relevant files:
 
----
+- `src/app/actions/prescriptions.ts`
+- `src/app/prescriptions/[token]/page.tsx`
+- `src/lib/audit.ts`
 
-## Prescription Workflow
+### Public clinic assistant
 
-This is a key product workflow and is now partly implemented.
+The public assistant is intentionally limited to clinic logistics and uses the Gemini API:
 
-### Goal
+- server-side REST call to Gemini
+- schema validation on incoming payloads
+- central clinic facts in `src/lib/clinic-data.ts`
+- fast local answers for common FAQ-style questions
+- no Prisma or patient record access
 
-A logged-in doctor should be able to create a prescription tied to a specific appointment and patient, and share a secure public link when needed.
+Relevant files:
 
-### Data model flow
-
-A prescription should be created from:
-
-- patient
-- appointment
-- admin / doctor
-- medication list and instructions
-
-The existing Prisma schema already supports this foundation:
-
-- `Prescription`
-- `PrescriptionItem`
-- relation to `Patient`
-- relation to `Appointment`
-- relation to `Admin`
-
-### Prescription creation fields
-
-For each prescription:
-
-- patient name / patient record
-- appointment reference
-- issue date
-- one or more medication items
-- dosage
-- frequency
-- duration
-- special instructions
-
-### Current implementation status
-
-The project already supports:
-
-- creating a prescription from an appointment
-- storing medication rows in the database
-- generating a share token
-- exposing a public no-login read-only prescription page
-- downloading the prescription in a simple text format
-
-### Future prescription work
-
-The following requirements remain for a more complete workflow:
-
-- PDF / printable export for the doctor and patient
-- stronger patient privacy controls
-- better public link management and revocation
-- improved prescriptions list UX and detail interactions
+- `src/app/api/assistant/route.ts`
+- `src/lib/clinic-data.ts`
 
 ---
 
-## Next Priorities
+## Verified implementation details
 
-### Priority 1: Harden admin auth
+These are the actual facts reflected in the application codebase:
 
-Move from the current demo-only flow to a more production-safe system.
-
-Recommended approach:
-
-- store hashed passwords in the `Admin` model
-- create real admin records instead of relying on env fallback values
-- verify role-based access for staff vs admin-only views
-- keep the login screen isolated from the dashboard shell
-
-### Priority 2: Upgrade production safety
-
-- secure environment variables
-- validation on every admin action
-- error handling and user feedback
-- production-friendly database configuration
-- deployment readiness
-
-### Priority 3: Final product polish
-
-- improved notifications
-- richer prescription export tools
-- refined patient-sharing UX
-- broader workflow automation and reporting
+- the assistant expects `GEMINI_API_KEY`, not `OPENAI_API_KEY`
+- the session cookie name is `dm_admin_session`
+- the app uses a signed-cookie HMAC session flow and supports `AUTH_SECRET` / `NEXTAUTH_SECRET`
+- the default demo staff accounts are generated in `src/lib/auth.ts`
+- the app includes a dev-time audit log ensure script before startup
+- the clinic assistant prompt uses data from `src/lib/clinic-data.ts`
 
 ---
 
-## Final Guidance for Future Agents
+## Near-term roadmap
 
-When continuing this project:
+### 1. Harden auth and secrets
 
-- prefer incremental, realistic improvements
-- maintain the premium dental brand identity
-- keep the public website polished and responsive
-- treat the admin/backend as a functional clinic workflow, not only a mockup
-- implement auth and data access carefully
-- ensure every new feature supports the user story: doctor dashboard + patient access to prescription information
-- keep the project positioned as both a business workflow and a capable freelance delivery
+- replace seeded demo credentials with a staff-management flow
+- review and document expiry and rotation policy
+- centralize secret management for deployment
+- keep development secrets separate from production values
 
-The overall objective is a realistic dental clinic app that combines a strong public-facing brand with a useful backend workflow for practice management.
+### 2. Improve assistant reliability
 
-Each `PrescriptionItem` should include:
+- replace process-local rate limiting with shared infrastructure
+- document provider retention and operational limits
+- keep AI restricted to clinic logistics and non-clinical guidance
 
-- medication
-- dosage
-- frequency
-- duration
-- instructions (optional)
+### 3. Extend role-aware operations
 
-### Prescription creation flow
+- add real staff-user management for production-style admin flows
+- tighten permission checks around sensitive actions
+- ensure audit logging covers admin and workflow changes consistently
 
-1. Doctor opens appointment details
-2. Doctor clicks "Create prescription"
-3. System loads patient + appointment context
-4. Doctor fills medication list
-5. Server validates input
-6. Server creates `Prescription` and related `PrescriptionItem` records
-7. Revalidate relevant admin routes
-8. Prescription is saved and shown in the admin UI
+### 4. Production hardening
+
+- validate schema drift and migration safety
+- review privacy boundaries for patient and prescription data
+- add deployment checks for environment configuration and runtime monitoring
 
 ---
 
-## Patient Prescription Access Without Login
+## Recommended product direction
 
-This should be implemented carefully and securely.
+The best next milestone is not a rewrite. It is a hardening pass on the system that already works:
 
-### Requirements
+1. keep the public dental experience premium and polished
+2. keep the admin workflow realistic and role-aware
+3. strengthen secrets, sessions, and deployment configuration
+4. expand operational controls only after privacy and audit boundaries are in place
 
-A patient must be able to access their prescription without logging in, but only if they have a valid secure access link.
-
-### Recommended approach
-
-Use a secure, app-generated token or cryptographic reference.
-
-For example:
-
-- `prescriptionShareToken`
-- unique, random, signed token
-- token stored with the prescription record
-- token expires after a chosen window (for example 30 or 90 days)
-- route is public but restricted to valid tokens only
-
-### Public route pattern
-
-Example:
-
-- /prescriptions/[token]
-
-This route should:
-
-- validate the token
-- load the matching prescription record
-- verify that the patient matches the prescription
-- display the prescription in a read-only view
-- optionally allow PDF export
-
-### Security rules
-
-- never expose more than the prescription and necessary patient info
-- do not leak appointment history or unrelated records
-- use signed tokens rather than plain IDs
-- expire tokens automatically
-- do not allow arbitrary user-generated ID access
+This keeps the project in the sweet spot between a strong client-facing clinic website and a usable internal workflow prototype, without pretending it is fully production-grade yet.
 
 ---
 
-## Recommended Data Additions
+## Suggested next priorities
 
-Depending on the planned final functionality, the schema may need additional fields for safety and usability.
+### Priority 1: auth hardening
 
-### Admin auth additions
+- document and review session expiry policy
+- replace demo credentials with explicit staff provisioning
+- confirm every sensitive action is role-checked on the server
 
-- passwordHash
-- role
-- isActive
-- lastLoginAt
+### Priority 2: assistant hardening
 
-### Prescription public access additions
+- keep the assistant informational and non-clinical
+- move rate limiting to shared infrastructure before production use
+- treat the clinic data file as the source of truth for pricing and facts
 
-- shareToken
-- tokenCreatedAt
-- tokenExpiresAt
-- isTokenActive
+### Priority 3: operational polish
 
-### Appointment workflow additions
+- improve reporting and admin filtering
+- strengthen patient-link controls and access review
+- expand audit visibility for workflow actions
 
-- internal clinic notes
-- reminder sent status
-- lastUpdatedByAdminId
-
-### Patient record additions
-
-- date of birth (optional)
-- preferred contact method
-- notes
-
-These should be added only when needed for real functioning, not prematurely.
-
----
-
-## Server Action Design
-
-The project already uses server actions for appointment creation and status changes. The new backend flow should continue in the same pattern.
-
-### Suggested action files
-
-- src/app/actions/auth.ts
-- src/app/actions/admin.ts
-- src/app/actions/prescriptions.ts
-
-### Action responsibilities
-
-- `signInAdmin()`
-- `signOutAdmin()`
-- `createPrescription()`
-- `updateAppointmentStatus()`
-- `getPrescriptionForPublicToken()`
-- `createPrescriptionShareLink()`
-
-All write actions should be server-only and protected by admin session checks.
-
----
-
-## Routing Structure
-
-Suggested route map:
-
-```text
-src/app/
-├── admin/
-│   ├── login/page.tsx
-│   ├── layout.tsx
-│   ├── page.tsx
-│   ├── appointments/
-│   │   ├── page.tsx
-│   │   └── [id]/page.tsx
-│   ├── patients/
-│   │   ├── page.tsx
-│   │   └── [id]/page.tsx
-│   └── prescriptions/
-│       ├── page.tsx
-│       └── new/page.tsx
-├── prescriptions/
-│   └── [token]/page.tsx
-└── api/
-    └── auth/
-```
-
----
-
-## Suggested Implementation Phases
-
-### Phase 1: Admin authentication
-
-Status: mostly complete in demo form, pending production hardening.
-
-- set up NextAuth or a custom secure session system
-- create admin login page
-- protect admin routes
-- store hashed admin passwords
-- add redirect behavior for unauthenticated users
-- move from env-based admin values to real database-backed admin identities
-
-### Phase 2: Appointment operations
-
-Status: complete for list/detail and status workflow in the current admin UI.
-
-- build appointment detail pages
-- filter and search
-- update status actions
-- appointment review workflow
-
-### Phase 3: Prescription creation
-
-Status: partially planned; listing and detail presence exist, but creation workflow still pending.
-
-- doctor form for writing prescription items
-- attach prescription to appointment and patient
-- validate input and store records securely
-
-### Phase 4: Secure prescription sharing
-
-Status: not yet implemented.
-
-- generate token for each prescription
-- build public read-only prescription page
-- optionally add PDF export or print-friendly view
-
-### Phase 5: Hardening and production polish
-
-- logging and error handling
-- secure env validation
-- permission model
-- audit trail for admin actions
-- deployment checks
-
----
-
-## Security Checklist
-
-Before moving into production, confirm all of the following:
-
-- admin login is protected with hashed passwords
-- session cookies are secure and HttpOnly
-- admin routes redirect unauthenticated users
-- public prescription pages use signed tokens
-- prescription links cannot be guessed or enumerated easily
-- server actions authorize only admin users
-- patient data is never returned to unauthenticated users
-- environment secrets are handled through secure config
-
----
-
-## MVP Acceptance Criteria
-
-The backend MVP is complete when all of the following work:
-
-- a doctor can log in
-- an unauthenticated user cannot access protected admin pages
-- a doctor can view appointments and patients
-- a doctor can change appointment status
-- a doctor can create prescriptions tied to an appointment
-- a patient can access a prescription via a secure link
-- the prescription page displays only the correct information
-- admin actions are server-side protected and validated
-
----
-
-## Suggested Next Action
-
-The fastest realistic sequence is:
-
-1. add admin login and session protection
-2. secure the admin dashboard routes
-3. complete the appointment management flow
-4. build prescription form and server action
-5. add secure public prescription token route
-6. polish with minimal PDF/export support
-
-This order keeps the project moving without overbuilding the backend too early.
-
----
-
-## Final Recommendation
-
-The project should evolve toward a practical clinic system that supports:
-
-- doctor/admin access for management
-- patient appointment intake from the public site
-- secure prescription issuance
-- safe patient-friendly prescription viewing
-
-This path matches the product intent and keeps the project aligned with the real-world dental clinic use case.
+The project should continue to evolve as a realistic clinic management demo, with a premium public brand, workable admin tooling, and secure patient-facing prescription access.
